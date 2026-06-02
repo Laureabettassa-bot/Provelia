@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Provelia — Communication Digitale pour PME</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --noir: #0a0a0a;
+    --creme: #f5f0e8;
+    --or: #c9a84c;
+    --or-clair: #e8d5a3;
+    --gris: #6b6b6b;
+    --gris-clair: #d4d0c8;
+    --blanc: #fafaf7;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--blanc);
+    color: var(--noir);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--or);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--or);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s ease;
+    opacity: 0.6;
+  }
+  .cursor.hover { width: 6px; height: 6px; background: var(--noir); }
+  .cursor-ring.hover { width: 50px; height: 50px; opacity: 1; border-color: var(--noir); }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 60px;
+    mix-blend-mode: normal;
+    transition: background 0.4s ease, padding 0.4s ease;
+  }
+  nav.scrolled {
+    background: rgba(250,250,247,0.95);
+    backdrop-filter: blur(12px);
+    padding: 18px 60px;
+    border-bottom: 1px solid var(--gris-clair);
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--noir);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--or); }
+  .nav-links { display: flex; gap: 40px; align-items: center; }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gris);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--or); }
+  .nav-cta {
+    background: var(--noir) !important;
+    color: var(--creme) !important;
+    padding: 12px 28px;
+    border: 1px solid var(--noir);
+    transition: background 0.3s ease, color 0.3s ease !important;
+  }
+  .nav-cta:hover { background: var(--or) !important; border-color: var(--or) !important; color: var(--noir) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left {
+    background: var(--noir);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
+  }
+  .hero-left::after {
+    content: 'P';
+    position: absolute;
+    bottom: -60px; left: -20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 380px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.03);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--or);
+    margin-bottom: 40px;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--or);
+  }
+  .hero-h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(52px, 5.5vw, 82px);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--creme);
+    margin-bottom: 36px;
+  }
+  .hero-h1 em { font-style: italic; color: var(--or); }
+  .hero-desc {
+    font-size: 15px;
+    line-height: 1.8;
+    color: rgba(245,240,232,0.65);
+    max-width: 420px;
+    margin-bottom: 56px;
+    font-weight: 300;
+  }
+  .hero-btns { display: flex; gap: 16px; align-items: center; }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--or);
+    color: var(--noir);
+    padding: 16px 36px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  .btn-primary:hover { background: var(--or-clair); transform: translateY(-2px); }
+  .btn-primary .arrow { font-size: 18px; transition: transform 0.3s ease; }
+  .btn-primary:hover .arrow { transform: translateX(4px); }
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--creme);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245,240,232,0.3);
+    padding-bottom: 2px;
+    transition: border-color 0.3s ease, color 0.3s ease;
+  }
+  .btn-ghost:hover { border-color: var(--or); color: var(--or); }
+  .hero-right {
+    background: var(--creme);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 60px 80px;
+    position: relative;
+  }
+  .hero-visual {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+  }
+  .card-mockup {
+    background: white;
+    border-radius: 2px;
+    padding: 32px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.12);
+    position: relative;
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  .card-mockup-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--or);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-mockup-tag::before { content: ''; width: 20px; height: 1px; background: var(--or); }
+  .card-mockup h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--noir);
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  .mock-lines { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+  .mock-line {
+    height: 8px;
+    background: var(--gris-clair);
+    border-radius: 4px;
+    animation: shimmer 2.5s ease-in-out infinite;
+  }
+  .mock-line:nth-child(1) { width: 90%; animation-delay: 0s; }
+  .mock-line:nth-child(2) { width: 75%; animation-delay: 0.15s; }
+  .mock-line:nth-child(3) { width: 82%; animation-delay: 0.3s; }
+  @keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .mock-footer { display: flex; align-items: center; justify-content: space-between; }
+  .mock-badge {
+    background: var(--noir);
+    color: var(--creme);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+  }
+  .mock-avatar-group { display: flex; }
+  .mock-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid white;
+    margin-left: -8px;
+  }
+  .mock-avatar:first-child { margin-left: 0; background: var(--or); }
+  .mock-avatar:nth-child(2) { background: #a0b4c8; }
+  .mock-avatar:nth-child(3) { background: #c8a0b4; }
+  .hero-stat {
+    position: absolute;
+    background: var(--noir);
+    color: var(--creme);
+    padding: 20px 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  }
+  .hero-stat-1 { bottom: -30px; left: -40px; animation: float 6s ease-in-out infinite 1s; }
+  .hero-stat-2 { top: -20px; right: -30px; animation: float 6s ease-in-out infinite 3s; }
+  .hero-stat .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--or);
+    line-height: 1;
+  }
+  .hero-stat .label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gris-clair); margin-top: 4px; }
+
+  /* SCROLL INDICATOR */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px; left: 60px;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(245,240,232,0.4);
+  }
+  .scroll-line { width: 40px; height: 1px; background: rgba(245,240,232,0.3); position: relative; overflow: hidden; }
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    left: -100%; top: 0; height: 100%; width: 100%;
+    background: var(--or);
+    animation: slide 2s ease-in-out infinite;
+  }
+  @keyframes slide { 0% { left: -100%; } 100% { left: 100%; } }
+
+  /* SECTION GÉNÉRIQUE */
+  section { padding: 120px 60px; }
+  .section-tag {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--or);
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+  }
+  .section-tag::before { content: ''; width: 30px; height: 1px; background: var(--or); }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 4vw, 64px);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--noir);
+    margin-bottom: 20px;
+  }
+  .section-title em { font-style: italic; color: var(--or); }
+
+  /* SERVICES */
+  .services { background: var(--blanc); }
+  .services-intro { max-width: 760px; margin: 0 auto 80px; text-align: center; }
+  .services-desc {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--gris);
+    font-weight: 300;
+    margin-top: 16px;
+  }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--gris-clair);
+  }
+  .service-card {
+    background: var(--blanc);
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s ease;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 0; height: 3px;
+    background: var(--or);
+    transition: width 0.4s ease;
+  }
+  .service-card:hover::before { width: 100%; }
+  .service-card:hover { background: #f8f5ef; }
+  .service-icon {
+    width: 52px; height: 52px;
+    border: 1px solid var(--gris-clair);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 28px;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+  .service-card:hover .service-icon { border-color: var(--or); background: rgba(201,168,76,0.08); }
+  .service-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--noir);
+    margin-bottom: 14px;
+  }
+  .service-card p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--gris);
+    font-weight: 300;
+  }
+
+  /* PACKS */
+  .packs { background: var(--noir); }
+  .packs .section-title { color: var(--creme); }
+  .packs-intro { max-width: 600px; margin: 0 auto 80px; text-align: center; }
+  .packs-intro .section-tag { justify-content: center; }
+  .packs-intro .section-tag::before { display: none; }
+  .packs-desc { font-size: 15px; line-height: 1.8; color: rgba(245,240,232,0.55); font-weight: 300; margin-top: 16px; }
+  .packs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .pack-card {
+    border: 1px solid rgba(245,240,232,0.12);
+    padding: 48px 36px;
+    position: relative;
+    transition: border-color 0.4s ease, transform 0.4s ease;
+    cursor: default;
+  }
+  .pack-card:hover { border-color: var(--or); transform: translateY(-6px); }
+  .pack-card.featured {
+    border-color: var(--or);
+    background: rgba(201,168,76,0.04);
+  }
+  .pack-badge {
+    position: absolute;
+    top: -14px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--or);
+    color: var(--noir);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .pack-name {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--or);
+    margin-bottom: 16px;
+  }
+  .pack-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 68px;
+    font-weight: 300;
+    color: var(--creme);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .pack-price sup { font-size: 24px; vertical-align: super; }
+  .pack-price sub { font-size: 18px; color: rgba(245,240,232,0.4); }
+  .pack-tagline {
+    font-size: 13px;
+    color: rgba(245,240,232,0.45);
+    margin-bottom: 36px;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .pack-divider { height: 1px; background: rgba(245,240,232,0.1); margin-bottom: 32px; }
+  .pack-features { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-bottom: 40px; }
+  .pack-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+    color: rgba(245,240,232,0.75);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+  .pack-features li::before {
+    content: '→';
+    color: var(--or);
+    flex-shrink: 0;
+    font-size: 13px;
+    margin-top: 1px;
+  }
+  .pack-features li.inactive { color: rgba(245,240,232,0.25); }
+  .pack-features li.inactive::before { color: rgba(245,240,232,0.2); }
+  .pack-cta {
+    display: block;
+    text-align: center;
+    padding: 15px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  .pack-cta-ghost {
+    border: 1px solid rgba(245,240,232,0.3);
+    color: rgba(245,240,232,0.7);
+  }
+  .pack-cta-ghost:hover { border-color: var(--or); color: var(--or); }
+  .pack-cta-solid { background: var(--or); color: var(--noir); }
+  .pack-cta-solid:hover { background: var(--or-clair); }
+
+  /* POURQUOI */
+  .why {
+    background: var(--creme);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 0;
+  }
+  .why-left {
+    padding: 120px 80px 120px 60px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .why-right {
+    background: var(--blanc);
+    padding: 120px 60px 120px 80px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .why-points { display: flex; flex-direction: column; gap: 40px; margin-top: 60px; }
+  .why-point { display: flex; gap: 28px; align-items: flex-start; }
+  .why-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--or);
+    line-height: 1;
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+  .why-point-content h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--noir);
+    margin-bottom: 8px;
+  }
+  .why-point-content p { font-size: 14px; line-height: 1.7; color: var(--gris); font-weight: 300; }
+  .big-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 3vw, 44px);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--noir);
+    line-height: 1.3;
+    position: relative;
+  }
+  .big-quote::before {
+    content: '"';
+    font-size: 120px;
+    color: var(--or);
+    opacity: 0.2;
+    line-height: 0;
+    position: absolute;
+    top: 50px; left: -20px;
+    font-style: normal;
+  }
+  .quote-author {
+    margin-top: 32px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .quote-line { width: 40px; height: 1px; background: var(--or); }
+  .quote-author span { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gris); }
+
+  /* PROCESSUS */
+  .process { background: var(--blanc); }
+  .process-inner { max-width: 900px; margin: 0 auto; }
+  .process-steps { display: flex; flex-direction: column; gap: 0; margin-top: 60px; }
+  .process-step {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 40px;
+    padding: 48px 0;
+    border-bottom: 1px solid var(--gris-clair);
+    position: relative;
+  }
+  .process-step:last-child { border-bottom: none; }
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 72px;
+    font-weight: 300;
+    color: var(--gris-clair);
+    line-height: 1;
+    transition: color 0.4s ease;
+  }
+  .process-step:hover .step-num { color: var(--or); }
+  .step-content { padding-top: 8px; }
+  .step-content h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--noir);
+    margin-bottom: 12px;
+  }
+  .step-content p { font-size: 14px; line-height: 1.8; color: var(--gris); font-weight: 300; }
+
+  /* CONTACT */
+  .contact {
+    background: var(--noir);
+    padding: 120px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+  }
+  .contact-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+  }
+  .contact .section-title { color: var(--creme); }
+  .contact .section-tag { justify-content: center; }
+  .contact .section-tag::before { display: none; }
+  .contact-desc { font-size: 15px; line-height: 1.8; color: rgba(245,240,232,0.55); font-weight: 300; max-width: 560px; margin: 20px auto 60px; }
+  .contact-methods { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+  .contact-method {
+    border: 1px solid rgba(245,240,232,0.15);
+    padding: 32px 40px;
+    text-decoration: none;
+    transition: all 0.4s ease;
+    flex: 1;
+    min-width: 220px;
+    max-width: 280px;
+  }
+  .contact-method:hover { border-color: var(--or); background: rgba(201,168,76,0.05); transform: translateY(-4px); }
+  .contact-method .icon { font-size: 28px; margin-bottom: 16px; display: block; }
+  .contact-method .type { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--or); margin-bottom: 10px; }
+  .contact-method .value { font-size: 15px; color: var(--creme); font-weight: 300; }
+
+  /* FOOTER */
+  footer {
+    background: #050505;
+    padding: 40px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(245,240,232,0.06);
+  }
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: rgba(245,240,232,0.5);
+  }
+  .footer-logo span { color: var(--or); }
+  .footer-copy { font-size: 12px; color: rgba(245,240,232,0.25); letter-spacing: 0.05em; }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.3);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .footer-links a:hover { color: var(--or); }
+
+  /* FADE IN */
+  .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+  .fade-in-delay-1 { transition-delay: 0.1s; }
+  .fade-in-delay-2 { transition-delay: 0.2s; }
+  .fade-in-delay-3 { transition-delay: 0.3s; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 20px 30px; }
+    nav.scrolled { padding: 14px 30px; }
+    .nav-links { display: none; }
+    section { padding: 80px 30px; }
+    .hero { grid-template-columns: 1fr; min-height: auto; }
+    .hero-right { display: none; }
+    .hero-left { padding: 120px 30px 80px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .packs-grid { grid-template-columns: 1fr; }
+    .why { grid-template-columns: 1fr; }
+    .why-left, .why-right { padding: 60px 30px; }
+    .contact-method { max-width: 100%; }
+    footer { flex-direction: column; gap: 20px; text-align: center; }
+    .footer-links { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">Prové<span>lia</span></a>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#packs">Nos packs</a>
+    <a href="#processus">Méthode</a>
+    <a href="#contact" class="nav-cta">Nous contacter</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-left">
+    <div class="hero-tag">Agence de communication digitale</div>
+    <h1 class="hero-h1">
+      Votre image,<br>
+      <em>sublimée.</em><br>
+      Votre temps,<br>
+      préservé.
+    </h1>
+    <p class="hero-desc">Provelia accompagne les PME dans la maîtrise de leur identité digitale. Posts LinkedIn, visuels, signatures, logos — nous prenons tout en charge.</p>
+    <div class="hero-btns">
+      <a href="#packs" class="btn-primary">Découvrir nos packs <span class="arrow">→</span></a>
+      <a href="#contact" class="btn-ghost">Nous écrire</a>
+    </div>
+    <div class="scroll-indicator">
+      <div class="scroll-line"></div>
+      Découvrir
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-visual">
+      <div class="hero-stat hero-stat-2">
+        <div class="num">+120</div>
+        <div class="label">PME accompagnées</div>
+      </div>
+      <div class="card-mockup">
+        <div class="card-mockup-tag">Post LinkedIn</div>
+        <h3>Votre expertise,<br>mise en lumière.</h3>
+        <div class="mock-lines">
+          <div class="mock-line"></div>
+          <div class="mock-line"></div>
+          <div class="mock-line"></div>
+        </div>
+        <div class="mock-footer">
+          <div class="mock-badge">Publié</div>
+          <div class="mock-avatar-group">
+            <div class="mock-avatar"></div>
+            <div class="mock-avatar"></div>
+            <div class="mock-avatar"></div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-stat hero-stat-1">
+        <div class="num">98%</div>
+        <div class="label">Satisfaction client</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="services-intro fade-in">
+    <div class="section-tag" style="justify-content:center"><span>Ce que nous faisons</span></div>
+    <h2 class="section-title" style="text-align:center">Une offre <em>complète</em><br>pour votre visibilité</h2>
+    <p class="services-desc">De l'identité visuelle à la présence sociale, nos équipes s'occupent de chaque détail de votre communication digitale — sans jamais toucher à votre code.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card fade-in">
+      <div class="service-icon">✦</div>
+      <h3>Posts LinkedIn</h3>
+      <p>Rédaction et conception de contenus engageants, calibrés pour votre secteur et votre audience cible.</p>
+    </div>
+    <div class="service-card fade-in fade-in-delay-1">
+      <div class="service-icon">◈</div>
+      <h3>Carrousels visuels</h3>
+      <p>Création de carrousels percutants pour valoriser votre expertise sous forme de slides attractives.</p>
+    </div>
+    <div class="service-card fade-in fade-in-delay-2">
+      <div class="service-icon">◉</div>
+      <h3>Signature de mail</h3>
+      <p>Design de signatures e-mail professionnelles et mémorables, cohérentes avec votre identité de marque.</p>
+    </div>
+    <div class="service-card fade-in">
+      <div class="service-icon">◆</div>
+      <h3>Création de logo</h3>
+      <p>Conception d'un logo sur-mesure qui reflète les valeurs et l'ambition de votre entreprise.</p>
+    </div>
+    <div class="service-card fade-in fade-in-delay-1">
+      <div class="service-icon">✉</div>
+      <h3>Réponses e-mail clients</h3>
+      <p>Rédaction de réponses professionnelles et adaptées pour soigner chaque point de contact client.</p>
+    </div>
+    <div class="service-card fade-in fade-in-delay-2">
+      <div class="service-icon">❋</div>
+      <h3>Identité visuelle</h3>
+      <p>Charte graphique, palette de couleurs, typographies — tout ce qui construit une marque reconnaissable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PACKS -->
+<section class="packs" id="packs">
+  <div class="packs-intro fade-in">
+    <div class="section-tag">Nos offres</div>
+    <h2 class="section-title" style="color:var(--creme)">Choisissez votre <em>niveau</em></h2>
+    <p class="packs-desc">Des formules transparentes, sans surprise, conçues pour s'adapter à vos ambitions et votre budget.</p>
+  </div>
+  <div class="packs-grid">
+
+    <!-- ESSENTIEL -->
+    <div class="pack-card fade-in">
+      <div class="pack-name">Essentiel</div>
+      <div class="pack-price"><sup>€</sup>299<sub>/mois</sub></div>
+      <div class="pack-tagline">Pour poser les premières bases</div>
+      <div class="pack-divider"></div>
+      <ul class="pack-features">
+        <li>4 posts LinkedIn par mois</li>
+        <li>1 signature e-mail professionnelle</li>
+        <li>Réponses types clients (3 modèles)</li>
+        <li>Suivi éditorial mensuel</li>
+        <li class="inactive">Carrousels LinkedIn</li>
+        <li class="inactive">Création de logo</li>
+        <li class="inactive">Identité visuelle complète</li>
+        <li class="inactive">Stratégie de contenu</li>
+      </ul>
+      <a href="mailto:provelia.digital@outlook.fr?subject=Pack Essentiel" class="pack-cta pack-cta-ghost">Choisir ce pack</a>
+    </div>
+
+    <!-- STANDARD -->
+    <div class="pack-card featured fade-in fade-in-delay-1">
+      <div class="pack-badge">Le plus choisi</div>
+      <div class="pack-name">Standard</div>
+      <div class="pack-price"><sup>€</sup>499<sub>/mois</sub></div>
+      <div class="pack-tagline">L'équilibre idéal</div>
+      <div class="pack-divider"></div>
+      <ul class="pack-features">
+        <li>8 posts LinkedIn par mois</li>
+        <li>2 carrousels LinkedIn par mois</li>
+        <li>Signature e-mail personnalisée</li>
+        <li>Réponses clients (10 modèles)</li>
+        <li>1 logo ou révision d'identité</li>
+        <li>Reporting mensuel performance</li>
+        <li>Révisions illimitées</li>
+        <li class="inactive">Stratégie éditoriale dédiée</li>
+      </ul>
+      <a href="mailto:provelia.digital@outlook.fr?subject=Pack Standard" class="pack-cta pack-cta-solid">Choisir ce pack</a>
+    </div>
+
+    <!-- PREMIUM -->
+    <div class="pack-card fade-in fade-in-delay-2">
+      <div class="pack-name">Premium</div>
+      <div class="pack-price"><sup>€</sup>999<sub>/mois</sub></div>
+      <div class="pack-tagline">L'accompagnement sur-mesure</div>
+      <div class="pack-divider"></div>
+      <ul class="pack-features">
+        <li>15 posts LinkedIn par mois</li>
+        <li>4 carrousels LinkedIn par mois</li>
+        <li>Identité visuelle complète</li>
+        <li>Logo + charte graphique</li>
+        <li>Réponses clients illimitées</li>
+        <li>Signatures multi-supports</li>
+        <li>Stratégie éditoriale dédiée</li>
+        <li>Réunion stratégique mensuelle</li>
+      </ul>
+      <a href="mailto:provelia.digital@outlook.fr?subject=Pack Premium" class="pack-cta pack-cta-ghost">Choisir ce pack</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- POURQUOI -->
+<section class="why" id="why">
+  <div class="why-left fade-in">
+    <div class="section-tag">Notre philosophie</div>
+    <h2 class="section-title">Pourquoi<br>Prové<em>lia</em> ?</h2>
+    <div class="why-points">
+      <div class="why-point">
+        <div class="why-num">01</div>
+        <div class="why-point-content">
+          <h4>Expertise PME</h4>
+          <p>Nous comprenons les contraintes et ambitions des petites et moyennes entreprises. Pas de solution générique.</p>
+        </div>
+      </div>
+      <div class="why-point">
+        <div class="why-num">02</div>
+        <div class="why-point-content">
+          <h4>Réactivité garantie</h4>
+          <p>Délais tenus, retours rapides, interlocuteur dédié. Votre temps est aussi précieux que le nôtre.</p>
+        </div>
+      </div>
+      <div class="why-point">
+        <div class="why-num">03</div>
+        <div class="why-point-content">
+          <h4>Résultats mesurables</h4>
+          <p>Chaque action est pensée pour produire un impact concret sur votre visibilité et votre crédibilité.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="why-right fade-in fade-in-delay-1" style="display:flex;flex-direction:column;justify-content:center;">
+    <p class="big-quote">
+      "Une PME qui communique bien est une PME qui inspire confiance avant même le premier échange."
+    </p>
+    <div class="quote-author">
+      <div class="quote-line"></div>
+      <span>L'équipe Provelia</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESSUS -->
+<section class="process" id="processus">
+  <div class="process-inner">
+    <div class="fade-in">
+      <div class="section-tag">Comment ça marche</div>
+      <h2 class="section-title">Notre <em>méthode</em></h2>
+    </div>
+    <div class="process-steps">
+      <div class="process-step fade-in">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h3>Découverte & brief</h3>
+          <p>On vous écoute. Votre activité, vos valeurs, votre ton, votre cible — tout ce qui fait que vous êtes unique. Cette étape pose les fondations de notre collaboration.</p>
+        </div>
+      </div>
+      <div class="process-step fade-in">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h3>Production & création</h3>
+          <p>Nos équipes passent à l'action. Rédaction, design, conception — chaque livrable est produit avec soin et aligné sur votre image de marque.</p>
+        </div>
+      </div>
+      <div class="process-step fade-in">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h3>Validation & retours</h3>
+          <p>Vous validez, vous commentez, nous ajustons. Jusqu'à ce que le résultat vous ressemble parfaitement. Révisions incluses dans tous nos packs.</p>
+        </div>
+      </div>
+      <div class="process-step fade-in">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h3>Suivi & optimisation</h3>
+          <p>On ne disparaît pas après la livraison. Reporting, analyse, ajustements stratégiques — nous restons à vos côtés sur la durée.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-inner fade-in">
+    <div class="section-tag">Travaillons ensemble</div>
+    <h2 class="section-title">Prêt à <em>vous démarquer</em> ?</h2>
+    <p class="contact-desc">Un projet, une question, envie d'échanger ? Contactez-nous, nous répondons sous 24h.</p>
+    <div class="contact-methods">
+      <a href="mailto:provelia.digital@outlook.fr" class="contact-method">
+        <span class="icon">✉</span>
+        <div class="type">Email</div>
+        <div class="value">provelia.digital<br>@outlook.fr</div>
+      </a>
+      <a href="mailto:provelia.digital@outlook.fr?subject=Demande de devis Provelia" class="contact-method">
+        <span class="icon">◈</span>
+        <div class="type">Devis gratuit</div>
+        <div class="value">Réponse sous 24h,<br>sans engagement</div>
+      </a>
+      <a href="mailto:provelia.digital@outlook.fr?subject=Pack Premium - Consultation" class="contact-method">
+        <span class="icon">✦</span>
+        <div class="type">Consultation</div>
+        <div class="value">Appel découverte<br>offert (30 min)</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Prové<span>lia</span></div>
+  <div class="footer-copy">© 2025 Provelia — Communication digitale pour PME</div>
+  <div class="footer-links">
+    <a href="#services">Services</a>
+    <a href="#packs">Packs</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx + 'px'; cursor.style.top = my + 'px'; });
+  function animateRing() { rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animateRing); }
+  animateRing();
+  document.querySelectorAll('a, button, .service-card, .pack-card, .process-step').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.classList.add('hover'); ring.classList.add('hover'); });
+    el.addEventListener('mouseleave', () => { cursor.classList.remove('hover'); ring.classList.remove('hover'); });
+  });
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); });
+
+  // Fade in on scroll
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
